@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+{% block title %}{{ profile_user.get_full_name|default:profile_user.username }} — Travel Together{% endblock %}
+{% block content %}
+<div class="container py-4">
+    <!-- Profile Header -->
+    <div class="card mb-4 border-0" style="background:linear-gradient(135deg,#0f172a,#1a56db);border-radius:20px">
+        <div class="card-body p-4">
+            <div class="d-flex align-items-center gap-4 flex-wrap">
+                <div class="avatar avatar-xl" style="background:rgba(255,255,255,0.15);font-size:2rem;color:white">
+                    {% if profile.profile_picture %}
+                    <img src="{{ profile.profile_picture.url }}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%">
+                    {% else %}
+                    {{ profile_user.first_name|first|default:profile_user.username|first|upper }}
+                    {% endif %}
+                </div>
+                <div style="flex:1">
+                    <h3 style="font-family:'Sora',sans-serif;font-weight:800;color:white;margin-bottom:0.25rem">{{ profile_user.get_full_name|default:profile_user.username }}</h3>
+                    <p style="color:rgba(255,255,255,0.6);margin-bottom:0.75rem">@{{ profile_user.username }}</p>
+                    <div class="d-flex gap-3 flex-wrap">
+                        {% if profile.city %}<span style="color:rgba(255,255,255,0.75);font-size:0.875rem"><i class="fas fa-map-marker-alt me-1"></i>{{ profile.city }}</span>{% endif %}
+                        {% if profile.phone %}<span style="color:rgba(255,255,255,0.75);font-size:0.875rem"><i class="fas fa-phone me-1"></i>{{ profile.phone }}</span>{% endif %}
+                        <span class="badge-status {% if profile.verification_status == 'verified' %}badge-verified{% else %}badge-unverified{% endif %}">
+                            {% if profile.verification_status == 'verified' %}<i class="fas fa-check-circle"></i>{% else %}<i class="fas fa-clock"></i>{% endif %}
+                            {{ profile.get_verification_status_display }}
+                        </span>
+                        {% if profile.is_driver %}<span class="badge-status badge-approved"><i class="fas fa-car"></i> Driver</span>{% endif %}
+                    </div>
+                </div>
+                {% if user == profile_user %}
+                <a href="{% url 'edit_profile' %}" class="btn btn-light btn-sm"><i class="fas fa-edit me-1"></i>Edit Profile</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Driver Info -->
+        {% if driver_profile %}
+        <div class="col-md-4">
+            <div class="card p-4">
+                <h6 style="font-family:'Sora',sans-serif;font-weight:700;margin-bottom:1rem"><i class="fas fa-car text-primary me-2"></i>Vehicle Info</h6>
+                <div class="mb-2"><span class="text-muted" style="font-size:0.8rem">Car Model</span><div style="font-weight:600">{{ driver_profile.car_model }}</div></div>
+                <div class="mb-2"><span class="text-muted" style="font-size:0.8rem">Car Number</span><div style="font-weight:600">{{ driver_profile.car_number }}</div></div>
+                {% if driver_profile.car_color %}<div class="mb-2"><span class="text-muted" style="font-size:0.8rem">Color</span><div style="font-weight:600">{{ driver_profile.car_color }}</div></div>{% endif %}
+                <div><span class="text-muted" style="font-size:0.8rem">Status</span><div>
+                    <span class="badge-status {% if driver_profile.verification_status == 'verified' %}badge-approved{% elif driver_profile.verification_status == 'rejected' %}badge-rejected{% else %}badge-pending{% endif %}">
+                        {{ driver_profile.get_verification_status_display }}
+                    </span>
+                </div></div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Rides -->
+        <div class="col">
+            <div class="card p-4">
+                <h6 style="font-family:'Sora',sans-serif;font-weight:700;margin-bottom:1rem"><i class="fas fa-route text-primary me-2"></i>Recent Rides as Driver ({{ rides_as_driver|length }})</h6>
+                {% for ride in rides_as_driver|slice:":5" %}
+                <a href="{% url 'ride_detail' ride.pk %}" class="d-flex align-items-center justify-content-between p-3 mb-2 rounded-3 text-decoration-none" style="background:var(--light-gray)">
+                    <div>
+                        <div style="font-weight:600;color:var(--dark)">{{ ride.start_city }} → {{ ride.destination_city }}</div>
+                        <div style="font-size:0.8rem;color:var(--gray)">{{ ride.departure_datetime|date:"d M Y" }} · ₹{{ ride.price_per_seat }}/seat</div>
+                    </div>
+                    <span class="badge-status badge-{{ ride.status }}">{{ ride.get_status_display }}</span>
+                </a>
+                {% empty %}
+                <p class="text-muted text-center py-3" style="font-size:0.9rem">No rides posted yet.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

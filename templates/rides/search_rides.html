@@ -1,0 +1,117 @@
+{% extends 'base.html' %}
+{% block title %}Search Rides — Travel Together{% endblock %}
+{% block content %}
+<div style="background:linear-gradient(135deg,#0f172a,#1a56db);padding:2.5rem 0">
+    <div class="container">
+        <h2 style="font-family:'Sora',sans-serif;font-weight:800;color:white;margin-bottom:1.25rem">Find Your Ride</h2>
+        <form method="get" class="row g-3 align-items-end">
+            <div class="col-md-3">
+                <label class="form-label" style="color:rgba(255,255,255,0.7);font-size:0.8rem">FROM</label>
+                {{ form.start_city }}
+            </div>
+            <div class="col-md-3">
+                <label class="form-label" style="color:rgba(255,255,255,0.7);font-size:0.8rem">TO</label>
+                {{ form.destination_city }}
+            </div>
+            <div class="col-md-2">
+                <label class="form-label" style="color:rgba(255,255,255,0.7);font-size:0.8rem">DATE</label>
+                {{ form.date }}
+            </div>
+            <div class="col-md-2">
+                <label class="form-label" style="color:rgba(255,255,255,0.7);font-size:0.8rem">SEATS</label>
+                {{ form.seats }}
+            </div>
+            <div class="col-md-2 d-flex gap-2">
+                <button type="submit" class="btn btn-warning fw-700 flex-fill"><i class="fas fa-search me-1"></i>Search</button>
+                <a href="{% url 'search_rides' %}" class="btn btn-outline-light"><i class="fas fa-times"></i></a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <p class="text-muted mb-0"><strong style="color:var(--dark)">{{ count }}</strong> ride{{ count|pluralize }} found</p>
+        <a href="{% url 'create_ride' %}" class="btn btn-primary btn-sm"><i class="fas fa-plus me-1"></i>Post a Ride</a>
+    </div>
+
+    {% if rides %}
+    <div class="row g-4">
+        {% for ride in rides %}
+        <div class="col-lg-6">
+            <div class="ride-card">
+                <!-- Route -->
+                <div class="route-line mb-3">
+                    <div>
+                        <div style="font-size:0.68rem;color:var(--gray);font-weight:700;text-transform:uppercase;letter-spacing:0.05em">From</div>
+                        <div class="city-label">{{ ride.start_city }}</div>
+                    </div>
+                    <div class="route-arrow"></div>
+                    <div style="text-align:right">
+                        <div style="font-size:0.68rem;color:var(--gray);font-weight:700;text-transform:uppercase;letter-spacing:0.05em">To</div>
+                        <div class="city-label">{{ ride.destination_city }}</div>
+                    </div>
+                </div>
+
+                <!-- Driver & Price -->
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div class="driver-mini">
+                        <div class="avatar">{{ ride.driver.first_name|first|default:ride.driver.username|first|upper }}</div>
+                        <div>
+                            <div style="font-weight:600;font-size:0.875rem;color:var(--dark)">{{ ride.driver.get_full_name|default:ride.driver.username }}</div>
+                            {% if ride.driver.driver_profile %}
+                            <div style="font-size:0.75rem;color:var(--gray)">
+                                <i class="fas fa-car me-1"></i>{{ ride.driver.driver_profile.car_model }}
+                                {% if ride.driver.driver_profile.verification_status == 'verified' %}
+                                <span style="color:var(--success);font-weight:600;margin-left:0.5rem"><i class="fas fa-check-circle"></i> Verified</span>
+                                {% endif %}
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div style="text-align:right">
+                        <div style="font-family:'Sora',sans-serif;font-weight:800;font-size:1.4rem;color:var(--primary)">₹{{ ride.price_per_seat }}</div>
+                        <div style="font-size:0.72rem;color:var(--gray)">per seat</div>
+                    </div>
+                </div>
+
+                <!-- Details -->
+                <div class="d-flex flex-wrap gap-3 mb-3" style="font-size:0.8rem;color:var(--gray)">
+                    <span><i class="fas fa-calendar-alt me-1"></i>{{ ride.departure_datetime|date:"d M Y" }}</span>
+                    <span><i class="fas fa-clock me-1"></i>{{ ride.departure_datetime|date:"g:i A" }}</span>
+                    <span><i class="fas fa-users me-1"></i>{{ ride.available_seats }} of {{ ride.total_seats }} seats free</span>
+                </div>
+
+                <!-- Seats visual -->
+                <div class="d-flex gap-1 mb-3">
+                    {% for i in ride.approved_passengers %}
+                    <span class="seat-dot seat-filled"></span>
+                    {% endfor %}
+                    {% for i in "xxx"|slice:":ride.available_seats" %}{% endfor %}
+                    {% with filled=ride.total_seats|add:"-1" %}
+                    {% for i in ride.approved_passengers %}<span class="seat-dot seat-filled"></span>{% endfor %}
+                    {% endwith %}
+                </div>
+
+                {% if ride.description %}
+                <p style="font-size:0.82rem;color:var(--gray);margin-bottom:1rem;line-height:1.5">{{ ride.description|truncatewords:12 }}</p>
+                {% endif %}
+
+                <div class="d-flex justify-content-between align-items-center">
+                    {% if ride.is_full %}<span class="badge-status badge-full"><i class="fas fa-ban me-1"></i>Full</span>
+                    {% else %}<span class="badge-status badge-active"><i class="fas fa-circle me-1" style="font-size:0.5rem"></i>Available</span>{% endif %}
+                    <a href="{% url 'ride_detail' ride.pk %}" class="btn btn-primary btn-sm">View Details →</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center py-5">
+        <div style="font-size:4rem;margin-bottom:1rem">🔍</div>
+        <h4 style="font-family:'Sora',sans-serif;color:var(--dark)">No rides found</h4>
+        <p class="text-muted">Try different cities or dates, or <a href="{% url 'create_ride' %}" style="color:var(--primary)">post your own ride</a>.</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% block title %}Edit Profile — Travel Together{% endblock %}
+{% block content %}
+<div class="container py-4" style="max-width:600px">
+    <h2 class="section-title mb-4">Edit Profile</h2>
+    <div class="card p-4">
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="row g-3">
+                <div class="col-6">
+                    <label class="form-label">First Name</label>
+                    <input type="text" name="first_name" value="{{ form.first_name.value|default:'' }}" class="form-control">
+                </div>
+                <div class="col-6">
+                    <label class="form-label">Last Name</label>
+                    <input type="text" name="last_name" value="{{ form.last_name.value|default:'' }}" class="form-control">
+                </div>
+                <div class="col-12">
+                    <label class="form-label">Email</label>
+                    <input type="email" name="email" value="{{ form.email.value|default:'' }}" class="form-control">
+                </div>
+                {% for field in form %}
+                {% if field.name not in 'first_name,last_name,email' %}
+                <div class="col-12">
+                    <label class="form-label">{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.errors %}<div class="text-danger mt-1" style="font-size:0.8rem">{{ field.errors.0 }}</div>{% endif %}
+                </div>
+                {% endif %}
+                {% endfor %}
+                <div class="col-12 d-flex gap-2 mt-2">
+                    <button type="submit" class="btn btn-primary"><i class="fas fa-save me-1"></i>Save Changes</button>
+                    <a href="{% url 'profile' %}" class="btn btn-light">Cancel</a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+{% block title %}Become a Driver — Travel Together{% endblock %}
+{% block content %}
+<div class="container py-4" style="max-width:640px">
+    <div class="text-center mb-4">
+        <div style="font-size:3rem;margin-bottom:0.75rem">🚗</div>
+        <h2 style="font-family:'Sora',sans-serif;font-weight:800">Become a Driver</h2>
+        <p class="text-muted">Submit your vehicle documents for verification. You can start posting rides after admin approval.</p>
+    </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-4 text-center">
+            <div class="step-icon"><i class="fas fa-file-upload" style="color:var(--primary)"></i></div>
+            <div style="font-size:0.85rem;font-weight:600">Submit Documents</div>
+        </div>
+        <div class="col-4 text-center">
+            <div class="step-icon"><i class="fas fa-shield-alt" style="color:var(--primary)"></i></div>
+            <div style="font-size:0.85rem;font-weight:600">Admin Verification</div>
+        </div>
+        <div class="col-4 text-center">
+            <div class="step-icon"><i class="fas fa-road" style="color:var(--primary)"></i></div>
+            <div style="font-size:0.85rem;font-weight:600">Start Posting Rides</div>
+        </div>
+    </div>
+
+    <div class="card p-4">
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <h6 style="font-family:'Sora',sans-serif;font-weight:700;margin-bottom:1rem;color:var(--primary)"><i class="fas fa-id-card me-2"></i>License Details</h6>
+            <div class="row g-3 mb-4">
+                <div class="col-md-6">
+                    <label class="form-label">License Number *</label>
+                    {{ form.license_number }}
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">License Image *</label>
+                    {{ form.license_image }}
+                </div>
+            </div>
+
+            <h6 style="font-family:'Sora',sans-serif;font-weight:700;margin-bottom:1rem;color:var(--primary)"><i class="fas fa-car me-2"></i>Vehicle Details</h6>
+            <div class="row g-3 mb-4">
+                <div class="col-md-4">
+                    <label class="form-label">Car Model *</label>
+                    {{ form.car_model }}
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Car Number *</label>
+                    {{ form.car_number }}
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Car Color</label>
+                    {{ form.car_color }}
+                </div>
+            </div>
+
+            <h6 style="font-family:'Sora',sans-serif;font-weight:700;margin-bottom:1rem;color:var(--primary)"><i class="fas fa-file-alt me-2"></i>Vehicle Documents</h6>
+            <div class="row g-3 mb-4">
+                <div class="col-md-6">
+                    <label class="form-label">RC Document *</label>
+                    {{ form.car_rc_document }}
+                    <div class="form-text">PDF or image accepted</div>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Insurance Document *</label>
+                    {{ form.insurance_document }}
+                    <div class="form-text">PDF or image accepted</div>
+                </div>
+            </div>
+
+            <div class="alert alert-info d-flex gap-2">
+                <i class="fas fa-info-circle mt-1"></i>
+                <div style="font-size:0.875rem">Your documents will be reviewed by our admin team within 24 hours. You'll be notified once verified.</div>
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100 py-3" style="font-size:0.95rem">
+                <i class="fas fa-paper-plane me-2"></i>Submit for Verification
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}

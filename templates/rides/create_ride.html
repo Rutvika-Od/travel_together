@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% block title %}{% if edit %}Edit{% else %}Post{% endif %} a Ride — Travel Together{% endblock %}
+{% block content %}
+<div class="container py-4" style="max-width:680px">
+    <div class="mb-4">
+        <h2 style="font-family:'Sora',sans-serif;font-weight:800;color:var(--dark)">{% if edit %}Edit Ride{% else %}Post a Ride{% endif %}</h2>
+        <p class="text-muted">Fill in your trip details and let passengers find you</p>
+    </div>
+    <div class="card p-4">
+        <form method="post">
+            {% csrf_token %}
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label">From City *</label>
+                    {{ form.start_city }}
+                    {% if form.start_city.errors %}<div class="text-danger mt-1" style="font-size:0.8rem">{{ form.start_city.errors.0 }}</div>{% endif %}
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">To City *</label>
+                    {{ form.destination_city }}
+                    {% if form.destination_city.errors %}<div class="text-danger mt-1" style="font-size:0.8rem">{{ form.destination_city.errors.0 }}</div>{% endif %}
+                </div>
+                <div class="col-12">
+                    <label class="form-label">Departure Date & Time *</label>
+                    {{ form.departure_datetime }}
+                    {% if form.departure_datetime.errors %}<div class="text-danger mt-1" style="font-size:0.8rem">{{ form.departure_datetime.errors.0 }}</div>{% endif %}
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Price Per Seat (₹) *</label>
+                    {{ form.price_per_seat }}
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Total Seats</label>
+                    {{ form.total_seats }}
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Available Seats</label>
+                    {{ form.available_seats }}
+                </div>
+                <div class="col-12">
+                    <label class="form-label">Pickup Points <span class="text-muted" style="font-weight:400">(comma-separated)</span></label>
+                    {{ form.pickup_points }}
+                    <div class="form-text">e.g. Palanpur Bus Stand, Railway Station</div>
+                </div>
+                <div class="col-12">
+                    <label class="form-label">Drop Points <span class="text-muted" style="font-weight:400">(comma-separated)</span></label>
+                    {{ form.drop_points }}
+                    <div class="form-text">e.g. Mehsana GSRTC Bus Stand, Civil Hospital</div>
+                </div>
+                <div class="col-12">
+                    <label class="form-label">Description</label>
+                    {{ form.description }}
+                </div>
+                <div class="col-12 d-flex gap-2 mt-2">
+                    <button type="submit" class="btn btn-primary py-2 px-4"><i class="fas fa-{% if edit %}save{% else %}plus{% endif %} me-2"></i>{% if edit %}Update Ride{% else %}Post Ride{% endif %}</button>
+                    <a href="{% if edit %}{% url 'ride_detail' ride.pk %}{% else %}{% url 'search_rides' %}{% endif %}" class="btn btn-light">Cancel</a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

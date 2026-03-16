@@ -1,0 +1,183 @@
+{% extends 'base.html' %}
+{% block title %}Travel Together — Share Rides, Save Money{% endblock %}
+
+{% block extra_css %}
+<style>
+.hero {
+    background: linear-gradient(135deg, #0f172a 0%, #1a56db 50%, #0ea5e9 100%);
+    padding: 5rem 0 4rem; color: white; position: relative; overflow: hidden;
+}
+.hero::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Cpath d='M50 50c0-5.523 4.477-10 10-10s10 4.477 10 10-4.477 10-10 10c0 5.523-4.477 10-10 10s-10-4.477-10-10 4.477-10 10-10zM10 10c0-5.523 4.477-10 10-10s10 4.477 10 10-4.477 10-10 10c0 5.523-4.477 10-10 10S0 25.523 0 20s4.477-10 10-10z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+.hero-title { font-family: 'Sora', sans-serif; font-size: clamp(2.25rem, 5vw, 3.5rem); font-weight: 800; line-height: 1.1; }
+.hero-title span { color: #fbbf24; }
+.hero-subtitle { font-size: 1.1rem; color: rgba(255,255,255,0.8); max-width: 480px; line-height: 1.6; }
+.search-card { background: white; border-radius: 20px; padding: 1.75rem; box-shadow: 0 20px 60px rgba(0,0,0,0.2); }
+.search-card .section-label { font-size: 0.75rem; font-weight: 700; color: var(--gray); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.4rem; }
+.hero-stat .num { font-family: 'Sora', sans-serif; font-size: 2rem; font-weight: 800; color: white; }
+.hero-stat .lbl { font-size: 0.8rem; color: rgba(255,255,255,0.65); }
+.how-step { text-align: center; padding: 1.5rem; }
+.step-num { width: 40px; height: 40px; border-radius: 50%; background: var(--primary); color: white; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1rem; margin: 0 auto 1rem; }
+.trust-badge { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 12px; padding: 0.75rem 1.25rem; display: flex; align-items: center; gap: 0.75rem; }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- HERO -->
+<section class="hero">
+    <div class="container position-relative">
+        <div class="row align-items-center g-5">
+            <div class="col-lg-6">
+                <p style="color:rgba(255,255,255,0.6);font-size:0.875rem;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:1rem">🇮🇳 India's Carpooling Platform</p>
+                <h1 class="hero-title mb-4">Share the <span>Journey,</span><br>Split the Cost</h1>
+                <p class="hero-subtitle mb-4">Connect with drivers and passengers on your route. Travel comfortably, save money, and reduce traffic — one ride at a time.</p>
+                <div class="d-flex gap-3 flex-wrap mb-5">
+                    <div class="trust-badge"><i class="fas fa-shield-alt" style="color:#fbbf24"></i><span style="font-size:0.85rem">Verified Drivers</span></div>
+                    <div class="trust-badge"><i class="fas fa-lock" style="color:#fbbf24"></i><span style="font-size:0.85rem">Secure Platform</span></div>
+                    <div class="trust-badge"><i class="fas fa-rupee-sign" style="color:#fbbf24"></i><span style="font-size:0.85rem">Affordable Rides</span></div>
+                </div>
+                <div class="d-flex gap-4 flex-wrap">
+                    <div class="hero-stat"><div class="num">{{ total_rides }}+</div><div class="lbl">Active Rides</div></div>
+                    <div class="hero-stat"><div class="num">{{ total_drivers }}+</div><div class="lbl">Verified Drivers</div></div>
+                    <div class="hero-stat"><div class="num">50+</div><div class="lbl">Cities</div></div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <!-- SEARCH CARD -->
+                <div class="search-card">
+                    <h5 style="font-family:'Sora',sans-serif;font-weight:700;color:var(--dark);margin-bottom:1.25rem"><i class="fas fa-search text-primary me-2"></i>Find Your Ride</h5>
+                    <form action="{% url 'search_rides' %}" method="get">
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <div class="section-label">From</div>
+                                <input type="text" name="start_city" class="form-control" placeholder="e.g. Palanpur, Ahmedabad">
+                            </div>
+                            <div class="col-12">
+                                <div class="section-label">To</div>
+                                <input type="text" name="destination_city" class="form-control" placeholder="e.g. Mehsana, Surat">
+                            </div>
+                            <div class="col-6">
+                                <div class="section-label">Date</div>
+                                <input type="date" name="date" class="form-control">
+                            </div>
+                            <div class="col-6">
+                                <div class="section-label">Seats</div>
+                                <select name="seats" class="form-control">
+                                    <option value="1">1 Seat</option>
+                                    <option value="2">2 Seats</option>
+                                    <option value="3">3 Seats</option>
+                                </select>
+                            </div>
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-primary w-100 py-3" style="font-size:1rem"><i class="fas fa-search me-2"></i>Search Rides</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="py-5 bg-white">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="section-title">How It Works</h2>
+            <p class="text-muted mt-2">Get started in 3 simple steps</p>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-4 how-step">
+                <div class="step-num">1</div>
+                <div style="font-size:2.5rem;margin-bottom:0.75rem">🔍</div>
+                <h5 style="font-family:'Sora',sans-serif;font-weight:700">Search Rides</h5>
+                <p class="text-muted" style="font-size:0.9rem">Enter your origin and destination city along with travel date to find available rides.</p>
+            </div>
+            <div class="col-md-4 how-step">
+                <div class="step-num">2</div>
+                <div style="font-size:2.5rem;margin-bottom:0.75rem">🤝</div>
+                <h5 style="font-family:'Sora',sans-serif;font-weight:700">Request a Seat</h5>
+                <p class="text-muted" style="font-size:0.9rem">Send a request to the driver. They'll review your profile and approve your seat.</p>
+            </div>
+            <div class="col-md-4 how-step">
+                <div class="step-num">3</div>
+                <div style="font-size:2.5rem;margin-bottom:0.75rem">🚗</div>
+                <h5 style="font-family:'Sora',sans-serif;font-weight:700">Travel Together</h5>
+                <p class="text-muted" style="font-size:0.9rem">Once approved, chat with your driver, confirm pickup, and enjoy your ride!</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- RECENT RIDES -->
+{% if recent_rides %}
+<section class="py-5" style="background:#f8fafc">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="section-title">Available Rides</h2>
+            <a href="{% url 'search_rides' %}" class="btn btn-outline-primary btn-sm">View All <i class="fas fa-arrow-right ms-1"></i></a>
+        </div>
+        <div class="row g-4">
+            {% for ride in recent_rides %}
+            <div class="col-lg-6">
+                <div class="ride-card">
+                    <div class="route-line mb-3">
+                        <div><div style="font-size:0.7rem;color:var(--gray);font-weight:600;text-transform:uppercase">From</div><div class="city-label">{{ ride.start_city }}</div></div>
+                        <div class="route-arrow"></div>
+                        <div style="text-align:right"><div style="font-size:0.7rem;color:var(--gray);font-weight:600;text-transform:uppercase">To</div><div class="city-label">{{ ride.destination_city }}</div></div>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div class="driver-mini">
+                            <div class="avatar">{{ ride.driver.first_name|first|default:ride.driver.username|first|upper }}</div>
+                            <div>
+                                <div style="font-weight:600;font-size:0.875rem">{{ ride.driver.get_full_name|default:ride.driver.username }}</div>
+                                {% if ride.driver.driver_profile %}<div style="font-size:0.75rem;color:var(--gray)">{{ ride.driver.driver_profile.car_model }}</div>{% endif %}
+                            </div>
+                        </div>
+                        <div style="text-align:right">
+                            <div style="font-family:'Sora',sans-serif;font-weight:800;font-size:1.3rem;color:var(--primary)">₹{{ ride.price_per_seat }}</div>
+                            <div style="font-size:0.75rem;color:var(--gray)">per seat</div>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="d-flex gap-3" style="font-size:0.82rem;color:var(--gray)">
+                            <span><i class="fas fa-calendar me-1"></i>{{ ride.departure_datetime|date:"d M, g:i A" }}</span>
+                            <span><i class="fas fa-user-friends me-1"></i>{{ ride.available_seats }} seats left</span>
+                        </div>
+                        <a href="{% url 'ride_detail' ride.pk %}" class="btn btn-primary btn-sm">View →</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- CTA -->
+<section class="py-5 bg-white">
+    <div class="container">
+        <div class="row g-4 align-items-stretch">
+            <div class="col-md-6">
+                <div class="card h-100 p-4 border-0" style="background:var(--primary-light)">
+                    <div style="font-size:3rem;margin-bottom:1rem">🧳</div>
+                    <h4 style="font-family:'Sora',sans-serif;font-weight:700;color:var(--primary)">Find a Ride</h4>
+                    <p class="text-muted" style="font-size:0.9rem;margin-bottom:1.5rem">Search for available rides between cities. Pay only for the seat you need.</p>
+                    <a href="{% url 'search_rides' %}" class="btn btn-primary mt-auto align-self-start">Search Rides</a>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card h-100 p-4 border-0" style="background:linear-gradient(135deg,#0f172a,#1a56db);color:white">
+                    <div style="font-size:3rem;margin-bottom:1rem">🚗</div>
+                    <h4 style="font-family:'Sora',sans-serif;font-weight:700">Offer a Ride</h4>
+                    <p style="color:rgba(255,255,255,0.75);font-size:0.9rem;margin-bottom:1.5rem">Share your journey, share the cost. Register as a driver and post your route today.</p>
+                    <a href="{% url 'become_driver' %}" class="btn btn-light mt-auto align-self-start" style="color:var(--primary)">Become a Driver</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

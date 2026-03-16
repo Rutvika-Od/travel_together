@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block title %}Notifications — Travel Together{% endblock %}
+{% block content %}
+<div class="container py-4" style="max-width:680px">
+    <h2 style="font-family:'Sora',sans-serif;font-weight:800;margin-bottom:1.5rem">Notifications</h2>
+    {% if notifications %}
+    {% for notif in notifications %}
+    <a href="{{ notif.link|default:'#' }}" class="d-flex align-items-start gap-3 p-3 rounded-3 mb-2 text-decoration-none" style="background:{% if not notif.is_read %}var(--primary-light){% else %}white{% endif %};border:1px solid {% if not notif.is_read %}var(--primary){% else %}var(--border){% endif %};transition:all 0.2s">
+        <div style="font-size:1.5rem;flex-shrink:0">
+            {% if notif.notif_type == 'ride_request' %}🙋
+            {% elif notif.notif_type == 'request_approved' %}✅
+            {% elif notif.notif_type == 'request_rejected' %}❌
+            {% elif notif.notif_type == 'new_message' %}💬
+            {% else %}🔔{% endif %}
+        </div>
+        <div style="flex:1">
+            <div style="font-size:0.9rem;{% if not notif.is_read %}font-weight:600;color:var(--dark){% else %}color:var(--gray){% endif %}">{{ notif.message }}</div>
+            <div style="font-size:0.75rem;color:var(--gray);margin-top:0.25rem">{{ notif.created_at|date:"d M Y, g:i A" }}</div>
+        </div>
+        {% if not notif.is_read %}<div style="width:8px;height:8px;border-radius:50%;background:var(--primary);flex-shrink:0;margin-top:6px"></div>{% endif %}
+    </a>
+    {% endfor %}
+    {% else %}
+    <div class="text-center py-5">
+        <div style="font-size:4rem;margin-bottom:1rem">🔔</div>
+        <h5 style="font-family:'Sora',sans-serif">All caught up!</h5>
+        <p class="text-muted">No notifications yet.</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

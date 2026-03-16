@@ -1,0 +1,154 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard — Travel Together{% endblock %}
+{% block content %}
+<div class="container py-4">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+        <div>
+            <h2 style="font-family:'Sora',sans-serif;font-weight:800;color:var(--dark)">Welcome back, {{ user.first_name|default:user.username }}! 👋</h2>
+            <p class="text-muted mb-0">Here's your travel overview</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="{% url 'search_rides' %}" class="btn btn-outline-primary"><i class="fas fa-search me-1"></i>Find Rides</a>
+            {% if driver_profile %}<a href="{% url 'create_ride' %}" class="btn btn-primary"><i class="fas fa-plus me-1"></i>Post Ride</a>
+            {% else %}<a href="{% url 'become_driver' %}" class="btn btn-primary"><i class="fas fa-car me-1"></i>Become Driver</a>{% endif %}
+        </div>
+    </div>
+
+    <!-- Stats Row -->
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-md-3">
+            <div class="stat-card text-center">
+                <div class="stat-num">{{ upcoming_rides.count }}</div>
+                <div class="stat-label">Upcoming Rides</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="stat-card text-center">
+                <div class="stat-num">{{ my_requests.count }}</div>
+                <div class="stat-label">Total Requests</div>
+            </div>
+        </div>
+        {% if driver_profile %}
+        <div class="col-6 col-md-3">
+            <div class="stat-card text-center">
+                <div class="stat-num">{{ my_rides|length }}</div>
+                <div class="stat-label">Rides Posted</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="stat-card text-center">
+                <div style="font-family:'Sora',sans-serif;font-size:1.75rem;font-weight:800;color:{% if driver_profile.verification_status == 'verified' %}var(--success){% else %}var(--warning){% endif %}">
+                    {% if driver_profile.verification_status == 'verified' %}✓{% else %}⏳{% endif %}
+                </div>
+                <div class="stat-label">Driver Status</div>
+                <div><span class="badge-status {% if driver_profile.verification_status == 'verified' %}badge-approved{% else %}badge-pending{% endif %}" style="font-size:0.7rem">{{ driver_profile.get_verification_status_display }}</span></div>
+            </div>
+        </div>
+        {% else %}
+        <div class="col-6 col-md-3">
+            <div class="stat-card text-center">
+                <div style="font-family:'Sora',sans-serif;font-size:1.75rem;font-weight:800;color:{% if profile.verification_status == 'verified' %}var(--success){% else %}var(--warning){% endif %}">
+                    {% if profile.verification_status == 'verified' %}✓{% else %}?{% endif %}
+                </div>
+                <div class="stat-label">Identity</div>
+                <div><span class="badge-status {% if profile.verification_status == 'verified' %}badge-verified{% else %}badge-unverified{% endif %}" style="font-size:0.7rem">{{ profile.get_verification_status_display }}</span></div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="stat-card text-center" style="cursor:pointer" onclick="location.href='{% url 'become_driver' %}'">
+                <div style="font-size:1.75rem">🚗</div>
+                <div class="stat-label mt-1">Become a Driver</div>
+                <div style="font-size:0.75rem;color:var(--primary);font-weight:600">Register →</div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Notifications -->
+    {% if notifications %}
+    <div class="alert alert-info d-flex align-items-start gap-3 mb-4">
+        <i class="fas fa-bell mt-1"></i>
+        <div>
+            <strong>{{ notifications.count }} new notification{{ notifications.count|pluralize }}</strong>
+            {% for n in notifications %}<div style="font-size:0.875rem;margin-top:0.25rem">{{ n.message }}</div>{% endfor %}
+            <a href="{% url 'notifications' %}" class="btn btn-sm btn-primary mt-2">View All</a>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="row g-4">
+        <!-- Upcoming Rides -->
+        <div class="col-lg-6">
+            <div class="card p-4 h-100">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h6 style="font-family:'Sora',sans-serif;font-weight:700;margin:0"><i class="fas fa-calendar-check text-primary me-2"></i>Upcoming Trips</h6>
+                    <a href="{% url 'my_rides' %}" class="btn btn-sm btn-outline-primary">View All</a>
+                </div>
+                {% for req in upcoming_rides %}
+                <a href="{% url 'ride_detail' req.ride.pk %}" class="d-flex align-items-center gap-3 p-3 rounded-3 mb-2 text-decoration-none" style="background:var(--primary-light)">
+                    <div class="avatar" style="flex-shrink:0">{{ req.ride.driver.first_name|first|upper }}</div>
+                    <div style="flex:1">
+                        <div style="font-weight:600;color:var(--dark);font-size:0.9rem">{{ req.ride.start_city }} → {{ req.ride.destination_city }}</div>
+                        <div style="font-size:0.78rem;color:var(--gray)">{{ req.ride.departure_datetime|date:"d M Y, g:i A" }}</div>
+                    </div>
+                    <span style="font-weight:700;color:var(--primary);font-size:0.9rem">₹{{ req.ride.price_per_seat }}</span>
+                </a>
+                {% empty %}
+                <div class="text-center py-4 text-muted">
+                    <div style="font-size:2.5rem;margin-bottom:0.5rem">🛣️</div>
+                    <p style="font-size:0.9rem">No upcoming trips. <a href="{% url 'search_rides' %}" style="color:var(--primary)">Find a ride!</a></p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- My Requests / Driver Rides -->
+        <div class="col-lg-6">
+            {% if driver_profile %}
+            <div class="card p-4 h-100">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h6 style="font-family:'Sora',sans-serif;font-weight:700;margin:0"><i class="fas fa-car text-primary me-2"></i>My Posted Rides</h6>
+                    <a href="{% url 'driver_dashboard' %}" class="btn btn-sm btn-outline-primary">Manage</a>
+                </div>
+                {% for ride in my_rides %}
+                <a href="{% url 'ride_detail' ride.pk %}" class="d-flex align-items-center justify-content-between p-3 rounded-3 mb-2 text-decoration-none" style="background:var(--light-gray)">
+                    <div>
+                        <div style="font-weight:600;color:var(--dark);font-size:0.9rem">{{ ride.start_city }} → {{ ride.destination_city }}</div>
+                        <div style="font-size:0.78rem;color:var(--gray)">{{ ride.departure_datetime|date:"d M Y" }} · {{ ride.available_seats }} seats left</div>
+                    </div>
+                    <span class="badge-status badge-{{ ride.status }}">{{ ride.get_status_display }}</span>
+                </a>
+                {% empty %}
+                <div class="text-center py-4 text-muted">
+                    <div style="font-size:2.5rem;margin-bottom:0.5rem">🚗</div>
+                    <p style="font-size:0.9rem">No rides posted. <a href="{% url 'create_ride' %}" style="color:var(--primary)">Post one!</a></p>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="card p-4 h-100">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h6 style="font-family:'Sora',sans-serif;font-weight:700;margin:0"><i class="fas fa-ticket-alt text-primary me-2"></i>My Requests</h6>
+                    <a href="{% url 'my_rides' %}" class="btn btn-sm btn-outline-primary">View All</a>
+                </div>
+                {% for req in my_requests %}
+                <a href="{% url 'ride_detail' req.ride.pk %}" class="d-flex align-items-center justify-content-between p-3 rounded-3 mb-2 text-decoration-none" style="background:var(--light-gray)">
+                    <div>
+                        <div style="font-weight:600;color:var(--dark);font-size:0.9rem">{{ req.ride.start_city }} → {{ req.ride.destination_city }}</div>
+                        <div style="font-size:0.78rem;color:var(--gray)">{{ req.ride.departure_datetime|date:"d M Y" }}</div>
+                    </div>
+                    <span class="badge-status badge-{{ req.status }}">{{ req.get_status_display }}</span>
+                </a>
+                {% empty %}
+                <div class="text-center py-4 text-muted">
+                    <div style="font-size:2.5rem;margin-bottom:0.5rem">🔍</div>
+                    <p style="font-size:0.9rem">No requests yet. <a href="{% url 'search_rides' %}" style="color:var(--primary)">Search rides!</a></p>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
